@@ -105,3 +105,6 @@ venv.bak/
 
 # pycharm
 .idea/
+
+# individual setting
+config/myculturelife-4b07b1c269c8.json
