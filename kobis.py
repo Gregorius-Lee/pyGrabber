@@ -16,6 +16,7 @@ import logging
 import string
 import datetime
 import time
+from gspreadapi import gspreadDocApi
 
 class kobisCrawler:
     def __init__(self):
@@ -202,16 +203,16 @@ class kobisCrawler:
             year = int(targetMonth.year)
             last_month = int(targetMonth.month)-1
             if last_month == 0:
-                file_name = 'resources/kopis-%s-%s.csv' % (str(year-1), str(12))
+                file_name = 'resources/kobis-%s-%s.csv' % (str(year-1), str(12))
             else:
-                file_name = 'resources/kopis-%s-%s.csv' % (str(year), str(last_month).zfill(2))
+                file_name = 'resources/kobis-%s-%s.csv' % (str(year), str(last_month).zfill(2))
 
             if os.path.exists(file_name):
                 last_df = pd.read_csv(file_name, index_col=0)
                 same_item_row = last_df[last_df['movie_name'] == movie_name]
 
                 if len(same_item_row) == 0:
-                    rank_lastweek = 0
+                    rank_lastweek = 21
                 else:
                     rank_lastweek = same_item_row['rank'].values[0]
             else:
@@ -234,7 +235,7 @@ class TargetMonth:
         self.month = month
 
 if __name__ == "__main__":
-    crawler = kobisCrawler()
+    '''crawler = kobisCrawler()
     driver = crawler.get_driver()
     month_set = ['03', '04', '05', '06', '07', '08', '09', '10', '11']
     try:
@@ -247,9 +248,23 @@ if __name__ == "__main__":
                                        'sales_rate', 'sales_total', 'seats', 'seats_total', 'screen', 'play_num',
                                        'main_country', 'country'])
 
-            file_name = 'resources/kopis-%s-%s.csv'%(targetMonth.year, targetMonth.month)
+            file_name = 'resources/kobis-%s-%s.csv'%(targetMonth.year, targetMonth.month)
             df.to_csv(file_name, encoding='utf-8-sig')
     except Exception as e:
         print(e)
     finally:
-        driver.quit()
+        driver.quit()'''
+    google_spread = gspreadDocApi()
+
+    df = pd.read_csv('resources/kobis-total.csv', index_col=0)
+
+    data = []
+
+    for index, row in df.iterrows():
+        data.append(row.tolist())
+
+    json_file_name = 'config/myculturelife-4b07b1c269c8.json'
+    spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1dE8WJBij6NQ3qav3dFuyDehIjYZjwirohmpUs0TeK78/edit#gid=12416882'
+    startIndex = 'KOBIS_월간!A2'
+
+    google_spread.appendData(json_file_name, spreadsheet_url, startIndex, data)
